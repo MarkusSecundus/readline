@@ -20,7 +20,7 @@ namespace System
         public static bool HistoryEnabled { get; set; }
         public static IAutoCompleteHandler AutoCompletionHandler { private get; set; }
 
-        public static string Read(string prompt = "", string @default = "")
+        public static string Read(string prompt = "", string @default = null)
         {
             Console.Write(prompt);
             KeyHandler keyHandler = new KeyHandler(new Console2(), _history, AutoCompletionHandler);
@@ -46,17 +46,44 @@ namespace System
             return GetText(keyHandler);
         }
 
+
         private static string GetText(KeyHandler keyHandler)
         {
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            ConsoleKeyInfo keyInfo = ReadKey();
+
             while (keyInfo.Key != ConsoleKey.Enter)
             {
+                //<Customised>
+                if (keyInfo.IsEOF() && keyHandler.Text == "")
+                    return null;
+                //</Customised>
                 keyHandler.Handle(keyInfo);
-                keyInfo = Console.ReadKey(true);
+                keyInfo = ReadKey();
             }
 
             Console.WriteLine();
             return keyHandler.Text;
         }
+
+
+        //<Customised>
+        private static bool _HasConsole = true;
+        private static ConsoleKeyInfo ReadKey()
+        {
+            if (_HasConsole)
+            {
+                try
+                {
+                    return Console.ReadKey(true);
+                }
+                catch { _HasConsole = false; }
+            }
+            int c = Console.In.Read();
+            return new ConsoleKeyInfo((char)c, c == '\n' ? ConsoleKey.Enter : ConsoleKey.D, false, false, control: c == -1);
+        }
+
+        private static bool IsEOF(this ConsoleKeyInfo key)
+            => key.Key == ConsoleKey.D && (key.Modifiers & ConsoleModifiers.Control) != 0;
+        //</Customised>
     }
 }

@@ -10,15 +10,15 @@ namespace Internal.ReadLine
     {
         private int _cursorPos;
         private int _cursorLimit;
-        private StringBuilder _text;
-        private List<string> _history;
+        private readonly StringBuilder _text;
+        private readonly IReadOnlyList<string> _history;
         private int _historyIndex;
         private ConsoleKeyInfo _keyInfo;
-        private Dictionary<string, Action> _keyActions;
+        private readonly IReadOnlyDictionary<string, Action> _keyActions;
         private string[] _completions;
         private int _completionStart;
         private int _completionsIndex;
-        private IConsole Console2;
+        private readonly IConsole Console2;
 
         private bool IsStartOfLine() => _cursorPos == 0;
 
@@ -128,7 +128,7 @@ namespace Internal.ReadLine
             string replacement = _text.ToString().Substring(index);
             int left = Console2.CursorLeft;
             int top = Console2.CursorTop;
-            Console2.Write(string.Format("{0} ", replacement));
+            Console2.Write(replacement + " ");
             Console2.SetCursorPosition(left, top);
             _cursorLimit--;
         }
@@ -152,7 +152,7 @@ namespace Internal.ReadLine
         {
             // local helper functions
             bool almostEndOfLine() => (_cursorLimit - _cursorPos) == 1;
-            int incrementIf(Func<bool> expression, int index) =>  expression() ? index + 1 : index;
+            int incrementIf(Func<bool> expression, int index) => expression() ? index + 1 : index;
             int decrementIf(Func<bool> expression, int index) => expression() ? index - 1 : index;
 
             if (IsStartOfLine()) { return; }
@@ -246,53 +246,53 @@ namespace Internal.ReadLine
             }
         }
 
-        public KeyHandler(IConsole console, List<string> history, IAutoCompleteHandler autoCompleteHandler)
+        public KeyHandler(IConsole console, IReadOnlyList<string> history, IAutoCompleteHandler autoCompleteHandler)
         {
             Console2 = console;
 
             _history = history ?? new List<string>();
             _historyIndex = _history.Count;
             _text = new StringBuilder();
-            _keyActions = new Dictionary<string, Action>();
+            var keyActions = new Dictionary<string, Action>();
 
-            _keyActions["LeftArrow"] = MoveCursorLeft;
-            _keyActions["Home"] = MoveCursorHome;
-            _keyActions["End"] = MoveCursorEnd;
-            _keyActions["ControlA"] = MoveCursorHome;
-            _keyActions["ControlB"] = MoveCursorLeft;
-            _keyActions["RightArrow"] = MoveCursorRight;
-            _keyActions["ControlF"] = MoveCursorRight;
-            _keyActions["ControlE"] = MoveCursorEnd;
-            _keyActions["Backspace"] = Backspace;
-            _keyActions["Delete"] = Delete;
-            _keyActions["ControlD"] = Delete;
-            _keyActions["ControlH"] = Backspace;
-            _keyActions["ControlL"] = ClearLine;
-            _keyActions["Escape"] = ClearLine;
-            _keyActions["UpArrow"] = PrevHistory;
-            _keyActions["ControlP"] = PrevHistory;
-            _keyActions["DownArrow"] = NextHistory;
-            _keyActions["ControlN"] = NextHistory;
-            _keyActions["ControlU"] = () =>
+            keyActions["LeftArrow"] = MoveCursorLeft;
+            keyActions["Home"] = MoveCursorHome;
+            keyActions["End"] = MoveCursorEnd;
+            keyActions["ControlA"] = MoveCursorHome;
+            keyActions["ControlB"] = MoveCursorLeft;
+            keyActions["RightArrow"] = MoveCursorRight;
+            keyActions["ControlF"] = MoveCursorRight;
+            keyActions["ControlE"] = MoveCursorEnd;
+            keyActions["Backspace"] = Backspace;
+            keyActions["Delete"] = Delete;
+            keyActions["ControlD"] = Delete;
+            keyActions["ControlH"] = Backspace;
+            keyActions["ControlL"] = ClearLine;
+            keyActions["Escape"] = ClearLine;
+            keyActions["UpArrow"] = PrevHistory;
+            keyActions["ControlP"] = PrevHistory;
+            keyActions["DownArrow"] = NextHistory;
+            keyActions["ControlN"] = NextHistory;
+            keyActions["ControlU"] = () =>
             {
                 while (!IsStartOfLine())
                     Backspace();
             };
-            _keyActions["ControlK"] = () =>
+            keyActions["ControlK"] = () =>
             {
                 int pos = _cursorPos;
                 MoveCursorEnd();
                 while (_cursorPos > pos)
                     Backspace();
             };
-            _keyActions["ControlW"] = () =>
+            keyActions["ControlW"] = () =>
             {
                 while (!IsStartOfLine() && _text[_cursorPos - 1] != ' ')
                     Backspace();
             };
-            _keyActions["ControlT"] = TransposeChars;
+            keyActions["ControlT"] = TransposeChars;
 
-            _keyActions["Tab"] = () =>
+            keyActions["Tab"] = () =>
             {
                 if (IsInAutoCompleteMode())
                 {
@@ -318,13 +318,14 @@ namespace Internal.ReadLine
                 }
             };
 
-            _keyActions["ShiftTab"] = () =>
+            keyActions["ShiftTab"] = () =>
             {
                 if (IsInAutoCompleteMode())
                 {
                     PreviousAutoComplete();
                 }
             };
+            this._keyActions = keyActions;
         }
 
         public void Handle(ConsoleKeyInfo keyInfo)
