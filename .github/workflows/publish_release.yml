@@ -17,7 +17,7 @@ jobs:
         
         
     - name: Pack nuget
-      run: dotnet pack ReadLine -o ./nugets
+      run: dotnet pack src/ReadLine -o ./nugets
       
     - name: Zip nugets
       uses: papeloto/action-zip@v1
