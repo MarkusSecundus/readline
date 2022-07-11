@@ -3,18 +3,19 @@
   <PropertyGroup>
     <AssemblyTitle>ReadLine</AssemblyTitle>
     <AssemblyDescription>A GNU-Readline like library for .NET/.NET Core</AssemblyDescription>
-    <AssemblyVersion>2.0.1</AssemblyVersion>
-    <Authors>Toni Solarin-Sodara</Authors>
+    <AssemblyVersion>2.1.0</AssemblyVersion>
+    <Authors>MarkusSecundus,Toni Solarin-Sodara</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DebugType>portable</DebugType>
     <AssemblyName>ReadLine</AssemblyName>
     <PackageId>MarkusSecundus.ReadLine</PackageId>
     <PackageVersion>$(AssemblyVersion)</PackageVersion>
     <PackageTags>readline;gnu;console;shell;cui</PackageTags>
-    <PackageProjectUrl>https://github.com/tonerdo/readline</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/tonerdo/readline/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/MarkusSecundus/readline</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/tonerdo/readline</RepositoryUrl>
+    <RepositoryUrl>https://github.com/MarkusSecundus/readline</RepositoryUrl>
+    <Company>MarkusSecundus</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
 </Project>
