@@ -15,9 +15,9 @@ jobs:
       with:
         dotnet-version: 5.0.x
         
+        
     - name: Pack nuget
-      run: dotnet pack ReadLine -o ./nugets
-      
+      run: dotnet pack src/ReadLine -o ./nugets
       
     - name: Zip nugets
       uses: papeloto/action-zip@v1
@@ -25,18 +25,11 @@ jobs:
         files: ./nugets
         dest: zips/ReadLine-nuget.zip
         
-        
-    - id: version_name
-      uses: QwerMike/xpath-action@v1
-      with:
-        filename: 'Directory.Build.props'
-        expression: '//Project/PropertyGroup/Version/text()'
-        
     - name: Github Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "v${{ steps.version_name.outputs.result }}"
+        automatic_release_tag: "latest_release"
         prerelease: false
         files: |
           zips/ReadLine-nuget.zip
